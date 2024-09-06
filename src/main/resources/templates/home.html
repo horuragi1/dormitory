@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link rel="stylesheet" href="/css/styles.css"> <!-- 외부 CSS 파일 링크 -->
+</head>
+<body>
+    <div class="login-container">
+        <h2>탐라영재관 스마트 기숙관리</h2>
+        <form th:action="@{/login}" method="post">
+            <input type="text" name="username" placeholder="아이디" required>
+            <input type="password" name="password" placeholder="패스워드" required>
+            <input type="submit" value="로그인">
+            <div th:if="${loginError}" th:text="${loginError}" class="error-message"></div>
+        </form>
+        <a href="/register" class="register-link">회원가입</a>
+    </div>
+</body>
+</html>
