@@ -1,5 +1,7 @@
 package com.example.demo.model;
 
+import java.time.LocalDate;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -7,8 +9,8 @@ import lombok.Setter;
 public class EventDTO {
     private Long id;
     private String title;
-    private String start;
-    private String end;
+    private LocalDate start;
+    private LocalDate end;
     private boolean allDay;
     private String color;
     private String textColor;

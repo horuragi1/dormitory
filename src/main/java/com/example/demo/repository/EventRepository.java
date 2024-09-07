@@ -1,10 +1,12 @@
 package com.example.demo.repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.example.demo.model.Event;
@@ -83,6 +85,32 @@ public class EventRepository {
 		return em.find(Event.class, eventId);
 		
 	}
+	
+	public Page<String> findPeopleByDate(@Param("date") LocalDate date, Pageable pageable) {
+        String jpql = "SELECT DISTINCT e.user.name FROM Event e WHERE e.start_date <= :date AND e.end_date >= :date";
+        TypedQuery<String> query = em.createQuery(jpql, String.class);
+        query.setParameter("date", date);
+        
+        // 전체 데이터 수 계산
+        String countJpql = "SELECT COUNT(DISTINCT e.user.name) FROM Event e WHERE e.start_date <= :date AND e.end_date >= :date";
+        TypedQuery<Long> countQuery = em.createQuery(countJpql, Long.class);
+        countQuery.setParameter("date", date);
+        Long totalCount = countQuery.getSingleResult();
+        
+        // 페이지네이션 적용
+        query.setFirstResult((int) pageable.getOffset());
+        query.setMaxResults(pageable.getPageSize());
+        
+        List<String> people = query.getResultList();
+        
+       // people 리스트의 모든 값을 출력
+        System.out.println("People list contents:");
+        for (String name : people) {
+            System.out.println(name);
+        }
+        
+        return new PageImpl<>(people, pageable, totalCount);
+    }
 
 
 

@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -69,6 +70,12 @@ public class EventService {
 
         return existingEvent;
     }
+	
+	public Page<String> findPeopleByDate(LocalDate date, Pageable pageable){
+		
+		return eventRepository.findPeopleByDate(date, pageable);
+		
+	}
 
 
 }

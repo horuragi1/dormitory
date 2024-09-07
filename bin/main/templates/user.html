@@ -40,6 +40,18 @@
         .main-content a:hover {
             text-decoration: underline;
         }
+
+        .logout-button {
+            background-color: #dc3545;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .logout-button:hover {
+            background-color: #c82333;
+        }
     </style>
 </head>
 <body>
@@ -53,6 +65,27 @@
         <a th:href="@{/apply}">외박신청</a>
         <a th:href="@{/edit}">외박수정</a>
         <a th:href="@{/view}">외박조회</a>
+        <button class="logout-button" onclick="logout()">로그아웃</button>
     </div>
+
+    <script>
+        function logout() {
+            fetch('/logout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include' // 세션 쿠키를 포함시킵니다.
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.href = '/'; // 로그인 페이지로 리다이렉트
+                } else {
+                    console.error('Logout failed');
+                }
+            })
+            .catch(error => console.error('Error logging out:', error));
+        }
+    </script>
 </body>
 </html>

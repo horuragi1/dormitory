@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,6 +12,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.example.demo.model.User;
 import com.example.demo.service.UserService;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -91,6 +95,16 @@ public class HomeController {
 		 return "redirect:/";
 		
 	}
+	
+	 @PostMapping("/logout")
+	    public String logout(HttpServletRequest request, HttpServletResponse response) {
+	        HttpSession session = request.getSession(false);
+	        if (session != null) {
+	            session.invalidate(); // 세션 무효화
+	        }
+	        
+	        return "home";
+	    }
 
 }
 

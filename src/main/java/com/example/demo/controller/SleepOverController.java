@@ -47,7 +47,7 @@ public class SleepOverController {
 	}
 	
 	@PostMapping("/submitDateRange")
-	public String apply_date(@RequestParam("startDate") String startDate, @RequestParam("endDate") String endDate, HttpSession session) {
+	public String apply_date(@RequestParam("startDate") LocalDate startDate, @RequestParam("endDate") LocalDate endDate, HttpSession session) {
 		
 		Event event = new Event();
 		
@@ -55,20 +55,7 @@ public class SleepOverController {
 		
 		User user = userService.findByUsername(username).get();
 		
-		// 날짜 형식을 정의
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        
-     // 날짜 문자열을 LocalDate로 파싱
-        LocalDate date = LocalDate.parse(endDate, formatter);
-        
-        // 하루 뒤 날짜 계산
-        LocalDate nextDay = date.plusDays(0);
-        
-        // 결과를 문자열로 포맷
-        String nextDayString = nextDay.format(formatter);
-       
-		
-		event.CreateEvent(user, startDate, nextDayString);
+		event.CreateEvent(user, startDate, endDate);
 		
 		eventService.saveEvent(event);
 		

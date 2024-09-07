@@ -1,5 +1,7 @@
 package com.example.demo.model;
 
+import java.time.LocalDate;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -17,8 +19,8 @@ public class Event {
 	private Long id;
 	
 	private String title;
-	private String start_date;
-	private String end_date;
+	private LocalDate start_date;
+	private LocalDate end_date;
 	private boolean allDay;
 	private String color;
 	private String textColor;
@@ -26,7 +28,7 @@ public class Event {
 	@ManyToOne
 	private User user;
 	
-	public Long CreateEvent(User user, String start, String end) {
+	public Long CreateEvent(User user, LocalDate start, LocalDate end) {
 		this.start_date = start;
 		this.end_date = end;
 		this.title = "외박";

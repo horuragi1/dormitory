@@ -6,43 +6,59 @@
     <style>
         body {
             display: flex;
+            flex-direction: column;
             font-family: Arial, sans-serif;
+            height: 100vh;
+            margin: 0;
+        }
+        #header {
+            display: flex;
+            height: 50%;
+            padding: 10px;
+            box-sizing: border-box;
         }
         #calendarContainer {
             width: 50%;
-            padding: 10px;
             box-sizing: border-box;
         }
         #detailsContainer {
             width: 50%;
-            padding: 10px;
             box-sizing: border-box;
             border-left: 2px solid #ccc;
         }
+        #footer {
+            flex-grow: 1;
+            padding: 10px;
+            box-sizing: border-box;
+            border-top: 2px solid #ccc;
+        }
+        #pagination {
+            margin-top: 10px;
+        }
         #eventDetails {
-            display: none; /* Initially hidden */
+            display: flex;
+            flex-direction: column;
         }
     </style>
 </head>
 <body>
-    <div id="calendarContainer">
-        <h1>외박 내역</h1>
-        <div id='calendar'></div>
+    <div id="header">
+        <div id="calendarContainer">
+            <h1>외박 내역</h1>
+            <div id='calendar'></div>
+        </div>
+        <div id="detailsContainer">
+            <h1>상세 내역</h1>
+            <div id="eventDetails">
+                <h2 id="eventTitle"></h2>
+                <p><strong>날짜:</strong> <span id="eventDate"></span></p>
+                <div id="peopleList"></div> <!-- 사람 이름 리스트 -->
+            </div>
+        </div>
     </div>
-    <div id="detailsContainer">
-        <h1>상세 내역</h1>
-        <div id="eventDetails">
-            <h2 id="eventTitle"></h2>
-            <p><strong>Date:</strong> <span id="eventDate"></span></p>
-            <p><strong>Start:</strong> <span id="eventStart"></span></p>
-            <p><strong>End:</strong> <span id="eventEnd"></span></p>
-            <p><strong>All Day:</strong> <span id="eventAllDay"></span></p>
-            <p><strong>Color:</strong> <span id="eventColor"></span></p>
-            <p><strong>Text Color:</strong> <span id="eventTextColor"></span></p>
-        </div>
-        <div id="noEventDetails">
-            <p>Select a date to see event details.</p>
-        </div>
+    <div id="footer">
+        <h1>모든 이벤트</h1>
+        <!-- 페이지네이션 영역 제거됨 -->
     </div>
 
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
@@ -53,24 +69,36 @@
                 initialView: 'dayGridMonth',
                 locale: 'ko',
                 dateClick: function(info) {
-                    var clickedDate = info.dateStr; // 클릭한 날짜
+                    var clickedDate = info.dateStr;
                     document.getElementById('eventDate').innerText = clickedDate;
 
-                    // 서버에서 날짜에 대한 이벤트 정보를 가져옴
-                    fetch(`/api/events/date/${clickedDate}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            // 날짜에 해당하는 이벤트 데이터 표시
-                            document.getElementById('eventTitle').innerText = data.title || 'No Title';
-                            document.getElementById('eventStart').innerText = data.start || 'No Start Time';
-                            document.getElementById('eventEnd').innerText = data.end || 'No End Time';
-                            document.getElementById('eventAllDay').innerText = data.allDay ? 'Yes' : 'No';
-                            document.getElementById('eventColor').innerText = data.color || 'No Color';
-                            document.getElementById('eventTextColor').innerText = data.textColor || 'No Text Color';
-                            document.getElementById('eventDetails').style.display = 'block';
-                            document.getElementById('noEventDetails').style.display = 'none';
-                        })
-                        .catch(error => console.error('Error fetching event:', error));
+                    // 페이지네이션 초기화
+                    let currentPage = 0;
+                    const pageSize = 10;
+
+                    function loadPeople(page) {
+                        fetch(`/api/events/date/${clickedDate}/people?page=${page}&size=${pageSize}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.content.length === 0) {
+                                    document.getElementById('peopleList').innerHTML = '<p>오늘 외박 중인 인원이 없습니다.</p>';
+                                } else {
+                                    const people = data.content.map(name => `<p>${name}</p>`).join('');
+                                    document.getElementById('peopleList').innerHTML = people;
+
+                                    // 페이지네이션 버튼 생성
+                                    const pages = Math.ceil(data.totalElements / pageSize);
+                                    const paginationButtons = Array.from({ length: pages }, (_, i) => {
+                                        return `<button ${i === page ? 'disabled' : ''} onclick="loadPeople(${i})">${i + 1}</button>`;
+                                    }).join('');
+                                    document.getElementById('pagination').innerHTML = paginationButtons;
+                                }
+                            })
+                            .catch(error => console.error('Error fetching people:', error));
+                    }
+
+                    // 초기 데이터 로드
+                    loadPeople(currentPage);
                 }
             });
             calendar.render();
