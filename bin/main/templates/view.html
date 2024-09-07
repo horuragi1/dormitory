@@ -29,11 +29,19 @@
                 .then(response => response.json())
                 .then(data => {
                     var events = data.map(event => {
+                    	
+                    	// 날짜를 증가시키기 위한 함수
+                        function incrementDate(dateStr) {
+                            var date = new Date(dateStr);
+                            date.setDate(date.getDate() + 1); // 하루 증가
+                            return date.toISOString().split('T')[0]; // YYYY-MM-DD 형식으로 반환
+                        }
+                    	
                         return {
                             id: event.id,
                             title: event.title,
                             start: event.start,   // start_date를 start로 매핑
-                            end: event.end,       // end_date를 end로 매핑
+                            end: incrementDate(event.end),       // end_date를 end로 매핑
                             allDay: event.allDay,
                             color: event.color,
                             textColor: event.textColor

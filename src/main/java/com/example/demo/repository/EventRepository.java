@@ -77,6 +77,12 @@ public class EventRepository {
 	    
 	    return eventId;
 	}
+	
+	public Event findByEventId(Long eventId) {
+		
+		return em.find(Event.class, eventId);
+		
+	}
 
 
 

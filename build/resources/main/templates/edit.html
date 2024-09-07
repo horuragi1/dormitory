@@ -13,6 +13,24 @@
 
     <button id="loadMoreBtn" onclick="loadMore()">Load More</button>
 
+    <!-- 수정 폼 -->
+    <div id="editForm" style="display:none;">
+        <h2>Edit Event</h2>
+        <form id="editEventForm">
+            <input type="hidden" id="editEventId" name="eventId">
+            <label for="editTitle">Title:</label>
+            <input type="text" id="editTitle" name="title" required><br>
+            <label for="editStartDate">Start Date:</label>
+            <input type="date" id="editStartDate" name="startDate" required><br>
+            <label for="editEndDate">End Date:</label>
+            <input type="date" id="editEndDate" name="endDate" required><br>
+            <button type="button" onclick="submitEdit()">Submit</button>
+            <button type="button" onclick="cancelEdit()">Cancel</button>
+        </form>
+    </div>
+    
+    <p><a th:href="@{/}">메인화면</a></p>
+
     <script type="text/javascript">
         let page = 0;  // 현재 페이지 번호
 
@@ -54,9 +72,65 @@
         }
 
         function editEvent(eventId) {
-            // 수정 버튼 클릭 시 동작할 함수
-            // 여기에서 수정 폼을 표시하거나 모달을 열 수 있습니다.
-            alert('Edit event with ID: ' + eventId);
+            // 서버에서 이벤트 정보를 가져와서 폼에 채워넣기
+            $.ajax({
+                url: '/api/events/' + eventId,
+                type: 'GET',
+                success: function(event) {
+                    // 폼 필드에 이벤트 데이터 채우기
+                    $('#editEventId').val(event.id);
+                    $('#editTitle').val(event.title);
+                    $('#editStartDate').val(event.start);
+                    $('#editEndDate').val(event.end);
+                    
+                    // 수정 폼 표시
+                    $('#editForm').show();
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error:', error);
+                }
+            });
+        }
+
+        function submitEdit() {
+            // 폼 데이터 가져오기
+            const eventId = $('#editEventId').val();
+            const title = $('#editTitle').val();
+            const startDate = $('#editStartDate').val();
+            const endDate = $('#editEndDate').val();
+
+            $.ajax({
+                url: '/api/events/' + eventId,
+                type: 'PUT',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    title: title,
+                    start_date: startDate,
+                    end_date: endDate,
+                    color: "#f9e6bb",
+                    textColor: "#ffffff"
+                }),
+                success: function(result) {
+                    // 수정 성공 시 UI 업데이트
+                    $('#eventList').find('div').each(function() {
+                        if ($(this).find('button').attr('onclick').includes(eventId)) {
+                            $(this).find('h3').text(title);
+                            $(this).find('p').text(startDate + ' ~ ' + endDate);
+                        }
+                    });
+
+                    // 폼 숨기기
+                    $('#editForm').hide();
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error:', error);
+                }
+            });
+        }
+
+        function cancelEdit() {
+            // 폼 숨기기
+            $('#editForm').hide();
         }
 
         function deleteEvent(eventId) {

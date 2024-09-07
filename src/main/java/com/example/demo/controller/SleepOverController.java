@@ -62,7 +62,7 @@ public class SleepOverController {
         LocalDate date = LocalDate.parse(endDate, formatter);
         
         // 하루 뒤 날짜 계산
-        LocalDate nextDay = date.plusDays(1);
+        LocalDate nextDay = date.plusDays(0);
         
         // 결과를 문자열로 포맷
         String nextDayString = nextDay.format(formatter);

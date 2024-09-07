@@ -44,6 +44,31 @@ public class EventService {
 		return rtr;
 		
 	}
+	
+	public Event findByEventId(Long eventId) {
+		
+		return eventRepository.findByEventId(eventId);
+		
+	}
+	
+	@Transactional
+    public Event updateEvent(Long eventId, Event updatedEvent) {
+        Event existingEvent = eventRepository.findByEventId(eventId);
+
+        if (existingEvent != null) {
+            existingEvent.setTitle(updatedEvent.getTitle());
+            existingEvent.setStart_date(updatedEvent.getStart_date());
+            existingEvent.setEnd_date(updatedEvent.getEnd_date());
+            existingEvent.setAllDay(true);
+            existingEvent.setColor(updatedEvent.getColor());
+            existingEvent.setTextColor(updatedEvent.getTextColor());
+            // 다른 필드도 필요에 따라 업데이트합니다.
+            
+            eventRepository.save(existingEvent);
+        }
+
+        return existingEvent;
+    }
 
 
 }
