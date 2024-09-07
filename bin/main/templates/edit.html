@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Event List</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>외박 내역 수정</h1>
+    
+    <div id="eventList">
+        <!-- 이벤트 목록이 여기에 렌더링됩니다 -->
+    </div>
+
+    <button id="loadMoreBtn" onclick="loadMore()">Load More</button>
+
+    <script type="text/javascript">
+        let page = 0;  // 현재 페이지 번호
+
+        function loadMore() {
+            $.ajax({
+                url: '/api/data-pages',
+                type: 'GET',
+                data: {
+                    page: page,  // 현재 페이지
+                    size: 10     // 페이지당 항목 수
+                },
+                success: function(data) {
+                    if (data.content.length > 0) {
+                        page++;  // 다음 페이지로 넘어가기
+
+                        data.content.forEach(function(event) {
+                            $('#eventList').append(
+                                '<div>' +
+                                    '<h3>' + event.title + '</h3>' +
+                                    '<p>' + event.start + ' ~ ' + event.end + '</p>' +
+                                    '<button onclick="editEvent(' + event.id + ')">Edit</button>' +
+                                    '<button onclick="deleteEvent(' + event.id + ')">Delete</button>' +
+                                '</div>'
+                            );
+                        });
+
+                        // 더 이상 데이터가 없으면 버튼 숨기기
+                        if (data.last) {
+                            $('#loadMoreBtn').hide();
+                        }
+                    } else {
+                        $('#loadMoreBtn').hide(); // 데이터가 없으면 버튼 숨기기
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error:', error);
+                }
+            });
+        }
+
+        function editEvent(eventId) {
+            // 수정 버튼 클릭 시 동작할 함수
+            // 여기에서 수정 폼을 표시하거나 모달을 열 수 있습니다.
+            alert('Edit event with ID: ' + eventId);
+        }
+
+        function deleteEvent(eventId) {
+            // 삭제 버튼 클릭 시 동작할 함수
+            if (confirm('Are you sure you want to delete this event?')) {
+                $.ajax({
+                    url: '/api/events/' + eventId,
+                    type: 'DELETE',
+                    success: function(result) {
+                        // 삭제 성공 시 UI 업데이트
+                        $('#eventList').find('div').each(function() {
+                            if ($(this).find('button').attr('onclick').includes(eventId)) {
+                                $(this).remove();
+                            }
+                        });
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error:', error);
+                    }
+                });
+            }
+        }
+
+        // 처음 페이지 로딩 시 자동으로 데이터 로드
+        $(document).ready(function() {
+            loadMore();
+        });
+    </script>
+</body>
+</html>
