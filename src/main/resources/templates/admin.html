@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Calendar and Details</title>
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
+    <style>
+        body {
+            display: flex;
+            font-family: Arial, sans-serif;
+        }
+        #calendarContainer {
+            width: 50%;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        #detailsContainer {
+            width: 50%;
+            padding: 10px;
+            box-sizing: border-box;
+            border-left: 2px solid #ccc;
+        }
+        #eventDetails {
+            display: none; /* Initially hidden */
+        }
+    </style>
+</head>
+<body>
+    <div id="calendarContainer">
+        <h1>외박 내역</h1>
+        <div id='calendar'></div>
+    </div>
+    <div id="detailsContainer">
+        <h1>상세 내역</h1>
+        <div id="eventDetails">
+            <h2 id="eventTitle"></h2>
+            <p><strong>Date:</strong> <span id="eventDate"></span></p>
+            <p><strong>Start:</strong> <span id="eventStart"></span></p>
+            <p><strong>End:</strong> <span id="eventEnd"></span></p>
+            <p><strong>All Day:</strong> <span id="eventAllDay"></span></p>
+            <p><strong>Color:</strong> <span id="eventColor"></span></p>
+            <p><strong>Text Color:</strong> <span id="eventTextColor"></span></p>
+        </div>
+        <div id="noEventDetails">
+            <p>Select a date to see event details.</p>
+        </div>
+    </div>
+
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var calendarEl = document.getElementById('calendar');
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                locale: 'ko',
+                dateClick: function(info) {
+                    var clickedDate = info.dateStr; // 클릭한 날짜
+                    document.getElementById('eventDate').innerText = clickedDate;
+
+                    // 서버에서 날짜에 대한 이벤트 정보를 가져옴
+                    fetch(`/api/events/date/${clickedDate}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            // 날짜에 해당하는 이벤트 데이터 표시
+                            document.getElementById('eventTitle').innerText = data.title || 'No Title';
+                            document.getElementById('eventStart').innerText = data.start || 'No Start Time';
+                            document.getElementById('eventEnd').innerText = data.end || 'No End Time';
+                            document.getElementById('eventAllDay').innerText = data.allDay ? 'Yes' : 'No';
+                            document.getElementById('eventColor').innerText = data.color || 'No Color';
+                            document.getElementById('eventTextColor').innerText = data.textColor || 'No Text Color';
+                            document.getElementById('eventDetails').style.display = 'block';
+                            document.getElementById('noEventDetails').style.display = 'none';
+                        })
+                        .catch(error => console.error('Error fetching event:', error));
+                }
+            });
+            calendar.render();
+        });
+    </script>
+</body>
+</html>

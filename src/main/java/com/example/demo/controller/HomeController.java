@@ -44,6 +44,12 @@ public class HomeController {
 			session.setAttribute("username", username);
 			model.addAttribute("username", username);
 			
+			if(username.equals("admin")) {
+				
+				return "admin";
+				
+			}
+			
 			return "user";
 		}
 		
