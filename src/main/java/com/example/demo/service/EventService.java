@@ -36,6 +36,14 @@ public class EventService {
 	public Page<Event> findEventsByUserId(Long userId, Pageable pageable) {
 	    return eventRepository.findEventsByUserId(userId, pageable);
 	}
+	
+	public Long deleteEventsByUserId(Long userId) {
+		
+		Long rtr = eventRepository.deleteEventsByEventId(userId);
+		
+		return rtr;
+		
+	}
 
 
 }

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import com.example.demo.model.Event;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -63,6 +64,20 @@ public class EventRepository {
 	    List<Event> events = query.getResultList();
 	    return new PageImpl<>(events, pageable, totalCount);
 	}
+	
+	@Transactional
+	public Long deleteEventsByEventId(Long eventId) {
+		Event event = em.find(Event.class, eventId); // 엔티티 조회
+	    if (event != null) {
+	        em.remove(event); // 엔티티 삭제
+	    }
+		 
+		 
+		 System.out.println("delete query executed!!!");
+	    
+	    return eventId;
+	}
+
 
 
 }
