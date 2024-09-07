@@ -1,7 +1,7 @@
 spring:
   datasource:
 #    url: jdbc:postgresql://postgres.vtisvamqqfioeiezdomq:01044552594p!@aws-0-ap-northeast-2.pooler.supabase.com:5432/postgres
-    url: jdbc:postgresql://aws-0-ap-northeast-2.pooler.supabase.com:6543/postgres?user=postgres.vtisvamqqfioeiezdomq&password=01044552594p!
+    url: jdbc:postgresql://aws-0-ap-northeast-2.pooler.supabase.com:6543/postgres?user=postgres.vtisvamqqfioeiezdomq&password=01044552594p!&prepareThreshold=0
     username: 
     password: 
     driver-class-name: org.postgresql.Driver
@@ -13,6 +13,9 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 #        show_sql: true
         format_sql: true
+        query:
+           # 쿼리 캐시 비활성화
+          cacheable: false
 logging.level:
   org.hibernate.SQL: debug
   org.hibernate.orm.jdbc.bind: trace
