@@ -10,31 +10,49 @@
             font-family: Arial, sans-serif;
             height: 100vh;
             margin: 0;
+            overflow: hidden;
         }
+
         #header {
             display: flex;
             height: 50%;
             padding: 10px;
             box-sizing: border-box;
+            overflow: hidden;
         }
+
         #calendarContainer {
             width: 50%;
             box-sizing: border-box;
+            overflow: auto;
+            height: 100%;
         }
+
+        #calendar {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
         #detailsContainer {
             width: 50%;
             box-sizing: border-box;
             border-left: 2px solid #ccc;
+            overflow: auto;
+            height: 100%;
         }
+
         #footer {
             flex-grow: 1;
             padding: 10px;
             box-sizing: border-box;
             border-top: 2px solid #ccc;
+            overflow: auto;
         }
-        #pagination {
+
+        #pagination, #peoplePagination {
             margin-top: 10px;
         }
+
         #eventDetails {
             display: flex;
             flex-direction: column;
@@ -52,63 +70,24 @@
             <div id="eventDetails">
                 <h2 id="eventTitle"></h2>
                 <p><strong>날짜:</strong> <span id="eventDate"></span></p>
-                <div id="peopleList"></div> <!-- 사람 이름 리스트 -->
+                <div id="peopleList"></div>
+                <div id="peoplePagination"></div> <!-- 날짜별 페이지네이션 영역 -->
             </div>
         </div>
     </div>
     <div id="footer">
         <h1>외박자 세부 내역</h1>
-        <div id="allEvents"></div> <!-- 모든 이벤트 표시 영역 -->
-        <div id="pagination"></div> <!-- 페이지네이션 영역 -->
+        <div id="allEvents"></div>
+        <div id="eventsPagination"></div> <!-- 모든 이벤트 페이지네이션 영역 -->
+        <button class="logout-button" onclick="logout()">로그아웃</button>
     </div>
 
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var calendarEl = document.getElementById('calendar');
-        var calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: 'dayGridMonth',
-            locale: 'ko',
-            dateClick: function(info) {
-                var clickedDate = info.dateStr;
-                document.getElementById('eventDate').innerText = clickedDate;
-
-                // 페이지네이션 초기화
-                let currentPage = 0;
-                const pageSize = 10;
-
-                function loadPeople(page) {
-                    fetch(`/api/events/date/${clickedDate}/people?page=${page}&size=${pageSize}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.content.length === 0) {
-                                document.getElementById('peopleList').innerHTML = '<p>오늘 외박 중인 인원이 없습니다.</p>';
-                            } else {
-                                const people = data.content.map(name => `<p>${name}</p>`).join('');
-                                document.getElementById('peopleList').innerHTML = people;
-
-                                // 페이지네이션 버튼 생성
-                                const pages = Math.ceil(data.totalElements / pageSize);
-                                const paginationButtons = Array.from({ length: pages }, (_, i) => {
-                                    return `<button ${i === page ? 'disabled' : ''} onclick="loadPeople(${i})">${i + 1}</button>`;
-                                }).join('');
-                                document.getElementById('pagination').innerHTML = paginationButtons;
-                            }
-                        })
-                        .catch(error => console.error('Error fetching people:', error));
-                }
-
-                // 초기 데이터 로드
-                loadPeople(currentPage);
-            }
-        });
-        calendar.render();
-
-        // 페이지가 로드되자마자 모든 이벤트 불러오기
-        let currentPage = 0;
-        const pageSize = 10;
-
         function loadEvents(page) {
+            console.log(`Loading events for page: ${page}`);
+            const pageSize = 10;
+
             fetch(`/api/events/all?page=${page}&size=${pageSize}`)
                 .then(response => response.json())
                 .then(data => {
@@ -128,16 +107,74 @@
                         const paginationButtons = Array.from({ length: pages }, (_, i) => {
                             return `<button ${i === page ? 'disabled' : ''} onclick="loadEvents(${i})">${i + 1}</button>`;
                         }).join('');
-                        document.getElementById('pagination').innerHTML = paginationButtons;
+                        document.getElementById('eventsPagination').innerHTML = paginationButtons;
                     }
                 })
                 .catch(error => console.error('Error fetching events:', error));
         }
 
-        // 페이지 로드 시 모든 이벤트 호출
-        loadEvents(currentPage);
-    });
-    </script>
+        function loadPeople(clickedDate, page) {
+            console.log(`Loading people for date: ${clickedDate} and page: ${page}`);
+            const pageSize = 10;
 
+            fetch(`/api/events/date/${clickedDate}/people?page=${page}&size=${pageSize}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.content.length === 0) {
+                        document.getElementById('peopleList').innerHTML = '<p>오늘 외박 중인 인원이 없습니다.</p>';
+                    } else {
+                        const people = data.content.map(name => `<p>${name}</p>`).join('');
+                        document.getElementById('peopleList').innerHTML = people;
+
+                        // 페이지네이션 버튼 생성
+                        const pages = Math.ceil(data.totalElements / pageSize);
+                        const paginationButtons = Array.from({ length: pages }, (_, i) => {
+                            return `<button ${i === page ? 'disabled' : ''} onclick="loadPeople('${clickedDate}', ${i})">${i + 1}</button>`;
+                        }).join('');
+                        document.getElementById('peoplePagination').innerHTML = paginationButtons;
+                    }
+                })
+                .catch(error => console.error('Error fetching people:', error));
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var calendarEl = document.getElementById('calendar');
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                locale: 'ko',
+                dateClick: function(info) {
+                    var clickedDate = info.dateStr;
+                    document.getElementById('eventDate').innerText = clickedDate;
+
+                    let currentPage = 0;
+                    loadPeople(clickedDate, currentPage);
+                }
+            });
+            calendar.render();
+
+            let currentPage = 0;
+            loadEvents(currentPage); // 페이지 로드 시 모든 이벤트 호출
+        });
+    </script>
+    
+    <script>
+        function logout() {
+            fetch('/logout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include' // 세션 쿠키를 포함시킵니다.
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.href = '/'; // 로그인 페이지로 리다이렉트
+                } else {
+                    console.error('Logout failed');
+                }
+            })
+            .catch(error => console.error('Error logging out:', error));
+        }
+    </script>
 </body>
 </html>
