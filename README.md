@@ -24,3 +24,9 @@
 
 <img width="1280" alt="관리자" src="https://github.com/user-attachments/assets/d3c519ba-deff-4276-8d8a-fa9b0b96c847">
 ## 관리자 계정으로 로그인하면 나오는 페이지입니다. 달력의 날짜를 클릭할 경우 해당 날짜의 외박한 인원의 이름을 파악할 수 있습니다. <br/><br/>
+
+아래는 테스트 / 관리자 계정 내역입니다. <br/>
+테스트 계정(12개) : test1, test2, test3, test4, test5, test6, test7, test8, test9, test10, test11, test12 <br/>
+관리자 계정 : admin <br/><br/>
+
+비밀번호는 모두 123입니다. <br/>
