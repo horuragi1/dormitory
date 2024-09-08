@@ -2,6 +2,7 @@
 
 ## https://dormitory-y0ee.onrender.com/ 을 이용해 직접 접속하셔셔 이용하실 수 있습니다.
 ## Spring Boot / Hibernate / Thymeleaf 템플릿 엔진을 이용하여 제작하였습니다. <br/><br/>
+## 배포는 Render 호스팅 서비스를 이용해 진행하였습니다. 무료 호스팅 옵션이라 조금 속도가 느릴 수 있습니다.
 
 <img width="1280" alt="로그인" src="https://github.com/user-attachments/assets/5f6218cb-3adb-440b-93d9-b114111e718d">
 ## 로그인 화면입니다. <br/><br/>
