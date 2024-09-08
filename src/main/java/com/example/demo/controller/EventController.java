@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.model.Event;
+import com.example.demo.model.EventWithPeople;
 import com.example.demo.service.EventService;
 import lombok.RequiredArgsConstructor;
 
@@ -58,6 +59,18 @@ public class EventController {
         Page<String> people = eventService.findPeopleByDate(localDate, PageRequest.of(page, size));
         
         return ResponseEntity.ok(people);
+    }
+    
+    @GetMapping("/all")
+    public ResponseEntity<Page<EventWithPeople>> getAllEventsWithPeople(
+            @RequestParam("page") int page,
+            @RequestParam("size") int size) {
+    	
+    	System.out.println("events finding!!!");
+
+        Page<EventWithPeople> events = eventService.findAllEventsWithPeople(PageRequest.of(page, size));
+
+        return ResponseEntity.ok(events);
     }
 
     // Other methods (e.g., for saving, updating, and deleting events)

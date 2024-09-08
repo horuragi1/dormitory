@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.model.Event;
+import com.example.demo.model.EventWithPeople;
 import com.example.demo.repository.EventRepository;
 
 import jakarta.transaction.Transactional;
@@ -74,6 +75,19 @@ public class EventService {
 	public Page<String> findPeopleByDate(LocalDate date, Pageable pageable){
 		
 		return eventRepository.findPeopleByDate(date, pageable);
+		
+	}
+	
+	public Page<Event> findAllEvents(Pageable pageable){
+		
+		return eventRepository.findAllEvents(pageable);
+		
+	}
+	
+	
+	public Page<EventWithPeople> findAllEventsWithPeople(Pageable pageable){
+		
+		return eventRepository.findAllEventsWithPeople(pageable);
 		
 	}
 

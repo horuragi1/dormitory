@@ -48,7 +48,7 @@
             <div id='calendar'></div>
         </div>
         <div id="detailsContainer">
-            <h1>상세 내역</h1>
+            <h1>날짜별 외박자 확인</h1>
             <div id="eventDetails">
                 <h2 id="eventTitle"></h2>
                 <p><strong>날짜:</strong> <span id="eventDate"></span></p>
@@ -57,52 +57,87 @@
         </div>
     </div>
     <div id="footer">
-        <h1>모든 이벤트</h1>
-        <!-- 페이지네이션 영역 제거됨 -->
+        <h1>외박자 세부 내역</h1>
+        <div id="allEvents"></div> <!-- 모든 이벤트 표시 영역 -->
+        <div id="pagination"></div> <!-- 페이지네이션 영역 -->
     </div>
 
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var calendarEl = document.getElementById('calendar');
-            var calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',
-                locale: 'ko',
-                dateClick: function(info) {
-                    var clickedDate = info.dateStr;
-                    document.getElementById('eventDate').innerText = clickedDate;
+    document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            locale: 'ko',
+            dateClick: function(info) {
+                var clickedDate = info.dateStr;
+                document.getElementById('eventDate').innerText = clickedDate;
 
-                    // 페이지네이션 초기화
-                    let currentPage = 0;
-                    const pageSize = 10;
+                // 페이지네이션 초기화
+                let currentPage = 0;
+                const pageSize = 10;
 
-                    function loadPeople(page) {
-                        fetch(`/api/events/date/${clickedDate}/people?page=${page}&size=${pageSize}`)
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.content.length === 0) {
-                                    document.getElementById('peopleList').innerHTML = '<p>오늘 외박 중인 인원이 없습니다.</p>';
-                                } else {
-                                    const people = data.content.map(name => `<p>${name}</p>`).join('');
-                                    document.getElementById('peopleList').innerHTML = people;
+                function loadPeople(page) {
+                    fetch(`/api/events/date/${clickedDate}/people?page=${page}&size=${pageSize}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.content.length === 0) {
+                                document.getElementById('peopleList').innerHTML = '<p>오늘 외박 중인 인원이 없습니다.</p>';
+                            } else {
+                                const people = data.content.map(name => `<p>${name}</p>`).join('');
+                                document.getElementById('peopleList').innerHTML = people;
 
-                                    // 페이지네이션 버튼 생성
-                                    const pages = Math.ceil(data.totalElements / pageSize);
-                                    const paginationButtons = Array.from({ length: pages }, (_, i) => {
-                                        return `<button ${i === page ? 'disabled' : ''} onclick="loadPeople(${i})">${i + 1}</button>`;
-                                    }).join('');
-                                    document.getElementById('pagination').innerHTML = paginationButtons;
-                                }
-                            })
-                            .catch(error => console.error('Error fetching people:', error));
-                    }
-
-                    // 초기 데이터 로드
-                    loadPeople(currentPage);
+                                // 페이지네이션 버튼 생성
+                                const pages = Math.ceil(data.totalElements / pageSize);
+                                const paginationButtons = Array.from({ length: pages }, (_, i) => {
+                                    return `<button ${i === page ? 'disabled' : ''} onclick="loadPeople(${i})">${i + 1}</button>`;
+                                }).join('');
+                                document.getElementById('pagination').innerHTML = paginationButtons;
+                            }
+                        })
+                        .catch(error => console.error('Error fetching people:', error));
                 }
-            });
-            calendar.render();
+
+                // 초기 데이터 로드
+                loadPeople(currentPage);
+            }
         });
+        calendar.render();
+
+        // 페이지가 로드되자마자 모든 이벤트 불러오기
+        let currentPage = 0;
+        const pageSize = 10;
+
+        function loadEvents(page) {
+            fetch(`/api/events/all?page=${page}&size=${pageSize}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.content.length === 0) {
+                        document.getElementById('allEvents').innerHTML = '<p>현재 모든 이벤트가 없습니다.</p>';
+                    } else {
+                        const events = data.content.map(event => `
+                            <div>
+                                <h3>${event.title}</h3>
+                                <p>${event.people} : ${event.start_date} ~ ${event.end_date}</p>
+                            </div>
+                        `).join('');
+                        document.getElementById('allEvents').innerHTML = events;
+
+                        // 페이지네이션 버튼 생성
+                        const pages = Math.ceil(data.totalElements / pageSize);
+                        const paginationButtons = Array.from({ length: pages }, (_, i) => {
+                            return `<button ${i === page ? 'disabled' : ''} onclick="loadEvents(${i})">${i + 1}</button>`;
+                        }).join('');
+                        document.getElementById('pagination').innerHTML = paginationButtons;
+                    }
+                })
+                .catch(error => console.error('Error fetching events:', error));
+        }
+
+        // 페이지 로드 시 모든 이벤트 호출
+        loadEvents(currentPage);
+    });
     </script>
+
 </body>
 </html>
