@@ -12,6 +12,8 @@
 
 <img width="790" alt="arc" src="https://github.com/user-attachments/assets/44940375-f63d-4b12-a4a8-c5570f1e6e9b">
 
+# 사용자 기능
+
 <img width="1280" alt="로그인" src="https://github.com/user-attachments/assets/5f6218cb-3adb-440b-93d9-b114111e718d">
  로그인 화면입니다. <br/><br/>
 
@@ -30,8 +32,12 @@
 <img width="1280" alt="외박 조회" src="https://github.com/user-attachments/assets/c48266f1-6cb3-4e57-8af9-49493200d493">
  회원 페이지에서 외박 조회 버튼을 누를 시 나오는 페이지입니다. <br/><br/>
 
+# 관리자 기능
+
 <img width="1280" alt="관리자" src="https://github.com/user-attachments/assets/d3c519ba-deff-4276-8d8a-fa9b0b96c847">
  관리자 계정으로 로그인하면 나오는 페이지입니다. 달력의 날짜를 클릭할 경우 해당 날짜의 외박한 인원의 이름을 파악할 수 있습니다. <br/><br/>
+
+ # 참고 사항
 
 아래는 테스트 / 관리자 계정 내역입니다. <br/>
 테스트 계정(12개) : test1, test2, test3, test4, test5, test6, test7, test8, test9, test10, test11, test12 <br/>
