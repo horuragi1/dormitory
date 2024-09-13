@@ -8,6 +8,10 @@
 ## Spring Boot / Hibernate / Thymeleaf 템플릿 엔진을 이용하여 제작하였습니다. <br/><br/>
 ## 배포는 AWS EC2 호스팅 서비스를 이용해 진행하였습니다.
 
+# 시스템 아키텍쳐
+
+<img width="790" alt="arc" src="https://github.com/user-attachments/assets/44940375-f63d-4b12-a4a8-c5570f1e6e9b">
+
 <img width="1280" alt="로그인" src="https://github.com/user-attachments/assets/5f6218cb-3adb-440b-93d9-b114111e718d">
  로그인 화면입니다. <br/><br/>
 
