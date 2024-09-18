@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>홈페이지</title>
+    <title>홈페이지 및 게시판</title>
     <link rel="stylesheet" href="/css/styles.css"> <!-- 외부 CSS 파일 링크 (선택 사항) -->
     <style>
         body {
@@ -28,6 +28,7 @@
             flex-direction: column; /* 수직으로 배치 */
             justify-content: center;
             align-items: center;
+            padding: 20px;
         }
 
         .main-content a {
@@ -52,6 +53,28 @@
         .logout-button:hover {
             background-color: #c82333;
         }
+
+        .post-item {
+            margin-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+
+        .pagination {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .pagination a {
+            text-decoration: none;
+            color: #007bff;
+            margin: 0 5px;
+        }
+
+        .pagination a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -60,7 +83,7 @@
         <span th:text="${username} + ' 님 안녕하세요'">[사용자 이름] 님 안녕하세요</span>
     </div>
 
-    <!-- 중앙: 링크들 -->
+    <!-- 중앙: 링크들 및 로그아웃 버튼 -->
     <div class="main-content">
         <a th:href="@{/apply}">외박신청</a>
         <a th:href="@{/edit}">외박수정</a>
@@ -68,7 +91,68 @@
         <button class="logout-button" onclick="logout()">로그아웃</button>
     </div>
 
+    <!-- 게시판 목록 -->
+    <div class="main-content" id="post-list">
+        <!-- 게시글 항목이 여기에 동적으로 추가됩니다. -->
+    </div>
+
+    <!-- 페이지네이션 -->
+    <div class="pagination" id="pagination">
+        <!-- 페이지네이션 링크가 여기에 동적으로 추가됩니다. -->
+    </div>
+
     <script>
+        const pageSize = 10; // 페이지 당 게시글 수
+        let currentPage = 0; // 현재 페이지
+        const boardId = 1; // 게시판 ID (예시로 1 사용, 실제 값으로 변경)
+
+        function fetchPosts(page) {
+            fetch(`/boards/${boardId}/posts?page=${page}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.text();  // 응답을 텍스트로 읽습니다.
+                })
+                .then(text => {
+                    try {
+                        console.log('Raw response:', text); // 원본 응답 데이터 로그
+                        const data = JSON.parse(text);  // 텍스트를 JSON으로 파싱합니다.
+                        const postList = document.getElementById('post-list');
+                        postList.innerHTML = '';  // 현재 게시글 목록을 지웁니다.
+
+                        data.content.forEach(post => {
+                            const postElement = document.createElement('div');
+                            postElement.className = 'post-item';
+                            postElement.innerHTML = `<h3>${post.title}</h3><p>${post.content}</p>`;
+                            postList.appendChild(postElement);
+                        });
+
+                        updatePagination(data.totalPages);
+                    } catch (error) {
+                        console.error('Error parsing JSON:', error);
+                    }
+                })
+                .catch(error => console.error('Error fetching posts:', error));
+        }
+
+        function updatePagination(totalPages) {
+            const pagination = document.getElementById('pagination');
+            pagination.innerHTML = ''; // 현재 페이지네이션을 지웁니다.
+
+            for (let i = 0; i < totalPages; i++) {
+                const pageLink = document.createElement('a');
+                pageLink.href = '#';
+                pageLink.innerText = i + 1;
+                pageLink.onclick = function (e) {
+                    e.preventDefault();
+                    currentPage = i;
+                    fetchPosts(currentPage);
+                };
+                pagination.appendChild(pageLink);
+            }
+        }
+
         function logout() {
             fetch('/logout', {
                 method: 'POST',
@@ -86,6 +170,9 @@
             })
             .catch(error => console.error('Error logging out:', error));
         }
+
+        // 초기 게시글 로드
+        fetchPosts(currentPage);
     </script>
 </body>
 </html>
